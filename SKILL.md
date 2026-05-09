@@ -5,7 +5,7 @@ description: Start an agent self-evolution audit from a simple user request, aut
 category: agent-self-evolution
 skillType: prompt
 tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, sacp]
-version: 0.2.0
+version: 0.2.1
 author: Solo AI Company OS
 dimensions: [memory, autonomy, reason, guard, act, perceive]
 capabilityClasses: [state_memory, autonomy_workflow, reasoning_review, safety_guard, action_tool, perception_tool]
@@ -86,6 +86,76 @@ Next-Run Bootstrap
 ```
 
 在得到人类批准前，不得修改 skill、config、gear，不得执行外部动作。
+
+## 短指令路由表
+
+用户不需要学习完整协议。每轮输出最后，Agent 必须给人类一个可直接回复的短指令菜单。
+
+```text
+你可以直接回复：
+进化 / 保存 / 暂停 / 跑分 / 继续 / 详情
+```
+
+当用户回复短指令时，按下面规则路由：
+
+```text
+开始:
+  action: start_audit
+  meaning: 自动寻找证据并生成审计结果，不修改系统。
+
+进化:
+  if no_evidence_pack:
+    action: start_audit
+  else if patch_proposal_exists and not_applied:
+    action: ask_or_apply_local_patch
+  else if patch_applied and missing_external_evidence:
+    action: ask_or_run_one_approved_test
+  else if benchmark_or_test_result_exists:
+    action: propose_next_evolution
+  else:
+    action: ask_one_clarifying_question
+
+保存:
+  action: save_audit_only
+  meaning: 只保存 Evidence Pack / Snapshot / Evolution Card / Field Note，不修改。
+
+暂停:
+  action: write_handoff_and_stop
+  meaning: 写清当前状态、缺失证据、下一步建议，然后停止。
+
+跑分:
+  if official_benchmark_already_approved:
+    action: run_exactly_one_benchmark
+  else:
+    action: ask_human_approval_for_one_benchmark
+
+继续:
+  action: next_small_safe_action
+  meaning: 只执行当前审计结果里的 next_small_action。
+
+详情:
+  action: explain_evidence_and_decision
+  meaning: 展开证据、推理依据、风险边界。
+```
+
+短指令不等于无限授权。`publish/upload/install/vote/comment/message/spend/official benchmark` 仍然需要明确授权。  
+如果用户只回复“进化”，Agent 可以应用本地补丁和本地测试；如果下一步需要 official benchmark，必须说明原因并请求“一次 benchmark”授权，除非用户已经明确批准。
+
+## 每轮结尾格式
+
+每次使用 Audit Evolution 后，最后都必须输出：
+
+```text
+建议下一步:
+<一句话说明>
+
+你可以直接回复:
+- 进化: <当前状态下会做什么>
+- 保存: 只保存审计结果
+- 暂停: 写 handoff 并停止
+- 跑分: <如果需要外部 benchmark，说明是否还需授权>
+- 详情: 展开证据和判断
+```
 
 ## 自动触发规则
 
@@ -171,6 +241,12 @@ Next-Run Bootstrap
 
 ```text
 是否批准开始进化？
+```
+
+并追加短指令菜单：
+
+```text
+你可以直接回复：进化 / 保存 / 暂停 / 跑分 / 详情
 ```
 
 ## Evidence Pack
@@ -307,7 +383,7 @@ Return:
 4. Minimal Skill Patch Proposal
 5. Field Note
 6. Next-Run Bootstrap
-7. 是否批准开始进化？
+7. Short Command Menu
 
 Rules:
 - 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。

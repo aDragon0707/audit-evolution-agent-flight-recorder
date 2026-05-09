@@ -32,6 +32,21 @@ Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。用户
 3. 暂停，等待更多证据
 ```
 
+为了让普通用户更容易用，每轮最后还会给一个短指令菜单：
+
+```text
+你可以直接回复：
+进化 / 保存 / 暂停 / 跑分 / 继续 / 详情
+```
+
+Agent 会自己判断当前阶段：
+
+- `进化`: 可能是先审计、应用本地补丁、请求一次 benchmark 证据，或提出下一轮。
+- `保存`: 只保存审计结果。
+- `暂停`: 写 handoff 并停止。
+- `跑分`: 没有授权就先请求批准，已授权才跑 exactly one。
+- `详情`: 展开证据和判断依据。
+
 ## 自动触发
 
 装上以后，不应该每次都等用户手动说“Use Audit Evolution”。当出现以下任一事件时，Agent 应该主动调用：
@@ -75,6 +90,12 @@ Agent 可以自动保存 run record、生成 evolution card、提出 minimal pat
 
 ```text
 Evidence Pack -> Snapshot -> Evolution Card -> Minimal Skill Patch Proposal -> Field Note -> Next-Run Bootstrap -> 是否批准开始进化？
+```
+
+用户下一句不用写长 prompt，只要回：
+
+```text
+进化
 ```
 
 ## 现场 Demo
