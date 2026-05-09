@@ -485,7 +485,7 @@
       <div class="proof">DeepSeek-only 路线已验证</div>
       <div class="proof">入口: 开始调用 Audit Evolution</div>
       <div class="proof">自动找: 跑分 / worklog / 失败 / 反馈 / handoff</div>
-      <div class="proof">输出: Evidence Pack / Snapshot / Evolution Card / Patch Proposal</div>
+      <div class="proof">输出: Evidence Pack / Snapshot / Evolution Card / Memory Ledger / Patch Proposal</div>
       <div class="proof">人类只回: 进化 / 保存 / 暂停 / 跑分</div>
     </div>
   </section>
@@ -559,6 +559,7 @@ context_pressure: 75%
 confidence: high
 handoff_directive: stop_expansion_write_snapshot
 evolution_decision: distill
+memory_target: proposed_only
 ---</pre>
       </div>
       <div class="panel clean">
@@ -577,6 +578,10 @@ uncertain_state:
 
 next_small_action:
 只做一个最小修复，然后验证。
+
+memory_ledger:
+- retrieval_key: act_direct_execution
+- expiry: 下一轮评测或被新证据推翻
 
 stop_condition:
 读满 5 个文件仍不清楚就停。
@@ -610,6 +615,7 @@ context 超过 70% 停止扩展。
       <div class="output-stack">
         <div class="mini-output"><strong>Evidence Pack</strong><span>先说明找到哪些证据、缺哪些证据、哪个文件更权威。</span></div>
         <div class="mini-output"><strong>Evolution Card</strong><span>识别本轮最该提升的能力维度：perceive / act / memory / guard / autonomy / reason。</span></div>
+        <div class="mini-output"><strong>Memory Ledger</strong><span>只沉淀少量 verified fact、user feedback、decision、retrieval key 和下一轮启动指令。</span></div>
         <div class="mini-output"><strong>Patch Proposal</strong><span>只提出一个最小补丁，不直接改系统。</span></div>
         <div class="mini-output"><strong>Short Command Menu</strong><span>最后给人类短选项：进化、保存、暂停、跑分、详情。</span></div>
       </div>
@@ -649,6 +655,11 @@ weak_dimension:
 
 minimal_patch:
   one skill change only
+
+memory_ledger:
+  type: skill_patch
+  retrieval_key: act_direct_execution
+  expiry: next benchmark or contradicted
 
 promotion_gate:
   dry-run -> payload audit -> receipt -> next benchmark</pre>
@@ -704,8 +715,9 @@ promotion_gate:
       <div class="flow-step"><div class="step-num">1</div><strong>触发</strong><span>用户说“开始调用”，或 benchmark / 失败 / 反馈自动触发。</span></div>
       <div class="flow-step"><div class="step-num">2</div><strong>找证据</strong><span>最多读 5 个相关文件，先列 Evidence Pack。</span></div>
       <div class="flow-step"><div class="step-num">3</div><strong>审计</strong><span>区分 verified_fact、stale_claim、unknown。</span></div>
-      <div class="flow-step"><div class="step-num">4</div><strong>提案</strong><span>只生成一个最小 patch proposal，不盲目重构。</span></div>
-      <div class="flow-step"><div class="step-num">5</div><strong>路由</strong><span>人类只回“进化/保存/暂停/跑分”，Agent 自己判断下一步。</span></div>
+      <div class="flow-step"><div class="step-num">4</div><strong>记忆</strong><span>只保存带证据、可过期、可检索的 Memory Ledger Entry。</span></div>
+      <div class="flow-step"><div class="step-num">5</div><strong>提案</strong><span>只生成一个最小 patch proposal，不盲目重构。</span></div>
+      <div class="flow-step"><div class="step-num">6</div><strong>路由</strong><span>人类只回“进化/保存/暂停/跑分”，Agent 自己判断下一步。</span></div>
     </div>
   </section>
 
@@ -732,9 +744,10 @@ promotion_gate:
         <div class="mini-output"><strong>1. Evidence Pack</strong><span>它找到了哪些证据，哪些没找到，可信度如何。</span></div>
         <div class="mini-output"><strong>2. Snapshot</strong><span>当前状态、未知点、停止条件。</span></div>
         <div class="mini-output"><strong>3. Evolution Card</strong><span>这一轮应该提升哪个能力维度，以及为什么。</span></div>
-        <div class="mini-output"><strong>4. Patch Proposal</strong><span>一个最小 skill/config/gear 补丁提案，不直接应用。</span></div>
-        <div class="mini-output"><strong>5. Next-Run Bootstrap</strong><span>下一轮启动时优先读取和执行的短指令。</span></div>
-        <div class="mini-output"><strong>6. Short Command Menu</strong><span>你可以直接回：进化 / 保存 / 暂停 / 跑分 / 详情。</span></div>
+        <div class="mini-output"><strong>4. Memory Ledger</strong><span>哪些事实、反馈、决策和检索 key 值得沉淀。</span></div>
+        <div class="mini-output"><strong>5. Patch Proposal</strong><span>一个最小 skill/config/gear 补丁提案，不直接应用。</span></div>
+        <div class="mini-output"><strong>6. Next-Run Bootstrap</strong><span>下一轮启动时优先读取和执行的短指令。</span></div>
+        <div class="mini-output"><strong>7. Short Command Menu</strong><span>你可以直接回：进化 / 保存 / 暂停 / 跑分 / 详情。</span></div>
       </div>
     </div>
     <p>观众不需要先理解 SACP，也不需要手动整理材料。只要一句话，就能看到自己的 Agent 如何从“完成一次任务”变成“沉淀一个能力”。</p>
@@ -746,7 +759,7 @@ promotion_gate:
       <span>一句话带走</span>
     </div>
     <div class="closing">我们不是让 Agent 只完成一次任务。<br>我们让它审计自己，并听懂人类一句“进化”。</div>
-    <p>Audit Evolution: 自动找证据，过程可审计，经验可沉淀，短指令可路由。</p>
+    <p>Audit Evolution: 自动找证据，过程可审计，记忆可检索，经验可沉淀，短指令可路由。</p>
     <div class="note">备用文件: dirty_log.md / clean_snapshot.md</div>
   </section>
 </main>

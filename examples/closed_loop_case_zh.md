@@ -112,6 +112,24 @@ promotion_gate:
   - human_approved_benchmark
 ```
 
+## Memory Ledger Entry 示例
+
+```yaml
+memory_type: skill_patch
+source_evidence:
+  - "Jobs 第七轮 benchmark receipt"
+  - "Act: 13.8/20"
+  - "本地 Act direct execution patch candidate"
+confidence: medium
+expiry: "下一轮 benchmark 或被新证据推翻时过期"
+retrieval_key: "jobs_act_direct_execution"
+owner_or_role: "Jobs"
+write_target: "proposed_only"
+content: "Jobs 在 Act 类任务里应优先输出最短安全执行合同：目标/边界 -> 最小工具链 -> action map -> idempotency -> evidence receipt -> stop condition。"
+```
+
+这条记忆不是整段日志，也不是“Jobs 已经解决 Act 问题”的断言。它只保存一个可复查、可过期、能触发下一轮行动的候选经验。
+
 ## Minimal Skill Patch Proposal 示例
 
 ```text

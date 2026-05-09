@@ -19,6 +19,7 @@ Audit Evolution 是一个 Agent 自进化飞行记录仪。用户只要说一句
 - `Evidence Pack`: 找到了哪些证据、缺了哪些证据、可信度如何。
 - `Snapshot`: 当前可信状态、未知状态、停止条件。
 - `Evolution Card`: 本轮最该提升的能力维度和证据。
+- `Memory Ledger Entry`: 本轮值得沉淀的少量可检索记忆。
 - `Minimal Skill Patch Proposal`: 一个最小可执行 skill 补丁提案。
 - `Field Note`: 可发社区的测试记录。
 - `Next-Run Bootstrap`: 下一轮启动时必须优先读取或执行的短指令。
@@ -44,8 +45,37 @@ Audit Evolution 是一个 Agent 自进化飞行记录仪。用户只要说一句
 Audit Evolution 给 Agent 一个固定进化回路：
 
 ```text
-事件 -> 自动找证据 -> Evidence Pack -> Snapshot -> Evolution Card -> Patch Proposal -> 人类批准 -> 本地测试 -> Field Note -> 下一轮启动指令
+事件 -> 自动找证据 -> Evidence Pack -> Snapshot -> Evolution Card -> Memory Ledger -> Patch Proposal -> 人类批准 -> 本地测试 -> Field Note -> 下一轮启动指令
 ```
+
+## 记忆层：不是多记，而是少记准记
+
+普通 memory 很容易把所有日志都塞进长期记忆，最后变成新的噪音源。Audit Evolution 的记忆层只沉淀下一轮真的要用的东西：
+
+```text
+verified_fact / user_feedback / decision / skill_patch / retrieval_key / next_run_bootstrap
+```
+
+原则是：
+
+```text
+少记、准记、带证据、可过期、能触发下一轮行动。
+```
+
+它不会要求用户引入数据库，也不会替代你原来的 worklog、handoff、dashboard 或 Obsidian。它只是把一次审计结果变成一条兼容的 `Memory Ledger Entry`：
+
+```yaml
+memory_type: skill_patch
+source_evidence: "latest benchmark receipt + local dry-run receipt"
+confidence: medium
+expiry: "next benchmark or when contradicted"
+retrieval_key: "act_direct_execution"
+owner_or_role: "agent"
+write_target: "proposed_only"
+content: "Act 类任务优先输出：目标/边界 -> 最小工具链 -> action map -> idempotency -> evidence receipt -> stop condition。"
+```
+
+默认只输出候选记忆，不自动落盘。只有人类回复“保存”或“进化”并允许本地写入时，才写入现有项目记忆。
 
 ## 三阶段工作流
 
@@ -146,10 +176,11 @@ Return:
 1. Evidence Pack
 2. Snapshot
 3. Evolution Card
-4. Minimal Skill Patch Proposal
-5. Field Note
-6. Next-Run Bootstrap
-7. Short Command Menu
+4. Memory Ledger Entry
+5. Minimal Skill Patch Proposal
+6. Field Note
+7. Next-Run Bootstrap
+8. Short Command Menu
 
 Rules:
 - 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。
@@ -202,6 +233,19 @@ promotion_gate:
   - payload_audit
   - receipt
   - next_test
+```
+
+### Memory Ledger Entry
+
+```yaml
+memory_type: verified_fact | user_feedback | decision | skill_patch | retrieval_key | next_run_bootstrap
+source_evidence:
+confidence: high | medium | low
+expiry: never | date | condition
+retrieval_key:
+owner_or_role:
+write_target:
+content:
 ```
 
 ### Field Note
@@ -285,3 +329,19 @@ examples/closed_loop_case_zh.md
 - 协议内核：`SACP`
 
 SACP 是一个轻量状态、证据、交接、晋升协议。用户不需要先理解协议，也能直接使用这个 skill。
+
+## 和其他 Skill 的差异
+
+| 类型 | 常见能力 | Audit Evolution 多做的一步 |
+|---|---|---|
+| Memory skill | 记录长期偏好和知识 | 只记录带证据、可过期、可检索、能触发行动的 Memory Ledger |
+| Review skill | 找 bug 或指出风险 | 继续生成最小补丁提案和晋升门槛 |
+| Benchmark skill | 得到一次分数 | 把分数变化转成下一轮能力修复 |
+| Handoff skill | 交接当前状态 | 追加 Evolution Card 和 Next-Run Bootstrap |
+
+最短说法：
+
+```text
+Memory 负责“记住”。
+Audit Evolution 负责“知道该记什么，以及下一轮怎么变强”。
+```

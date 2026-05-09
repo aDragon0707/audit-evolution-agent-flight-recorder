@@ -1,16 +1,16 @@
 ---
 name: audit-evolution
 displayName: Audit Evolution
-description: Start an agent self-evolution audit from a simple user request, automatically find run records, benchmark reports, worklogs, task outputs, failures, handoffs, user corrections, context pressure, and skill/config changes from current context or allowed files, then produce an evidence pack, audit snapshot, evolution card, minimal skill patch proposal, field note, next-run bootstrap, and ask for human approval before applying changes.
-category: agent-self-evolution
+description: Turn an agent's last run into a self-evolution loop: find evidence, separate facts from stale claims, produce a snapshot, evolution card, memory ledger entry, patch proposal, field note, next-run bootstrap, and route one-word human commands like "进化" without applying changes before approval.
+category: ai-agents
 skillType: prompt
-tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, sacp]
-version: 0.2.1
+tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, memory-ledger, sacp]
+version: 0.3.0
 author: Solo AI Company OS
 dimensions: [memory, autonomy, reason, guard, act, perceive]
 capabilityClasses: [state_memory, autonomy_workflow, reasoning_review, safety_guard, action_tool, perception_tool]
-evidenceFiles: [README.md, dirty_log.md, clean_snapshot.md, index.html]
-smokeTests: [snapshot_from_run_record, evolution_card_from_benchmark, minimal_skill_patch_gate, field_note_generation]
+evidenceFiles: [README.md, dirty_log.md, clean_snapshot.md, examples/closed_loop_case_zh.md, examples/memory_ledger_entry_zh.md, DESIGN_REVIEW_ZH.md, index.html]
+smokeTests: [evidence_pack_from_context, snapshot_from_run_record, evolution_card_from_benchmark, memory_ledger_entry, minimal_skill_patch_gate, short_command_routing]
 coreSkill: true
 ---
 
@@ -32,6 +32,27 @@ coreSkill: true
 
 Agent 就先在当前上下文和允许访问的文件里寻找证据，再生成审计结果和进化建议。  
 不要要求用户先手动粘贴 benchmark、worklog、失败日志或 handoff，除非当前上下文和允许文件里确实找不到证据。
+
+## 和普通 Memory Skill 的区别
+
+Audit Evolution 不替代长期记忆库，也不要求引入数据库。它只在每次审计后沉淀少量高价值记忆：
+
+```text
+verified_fact
+user_feedback
+decision
+skill_patch
+retrieval_key
+next_run_bootstrap
+```
+
+普通 memory 常见问题是“什么都记，最后更乱”。Audit Evolution 的记忆原则是：
+
+```text
+少记、准记、带证据、可过期、能触发下一轮行动。
+```
+
+如果项目已有 worklog、handoff、dashboard、员工/角色分工、Obsidian、Markdown vault 或其他记忆系统，Audit Evolution 应该把结果写成兼容的 `Memory Ledger Entry`，而不是另起一套重型系统。
 
 ## 三阶段工作流
 
@@ -66,6 +87,7 @@ recent_skill_config_gear_change
 Evidence Pack
 Snapshot
 Evolution Card
+Memory Ledger Entry
 Minimal Skill Patch Proposal
 Field Note
 Next-Run Bootstrap
@@ -187,12 +209,12 @@ skill_config_or_gear_changed
 ## 自动进化闭环
 
 ```text
-event -> evidence_search -> Evidence Pack -> Snapshot -> Evolution Card -> Patch Proposal -> Human Approval -> Local Test -> Field Note -> Next-Run Bootstrap
+event -> evidence_search -> Evidence Pack -> Snapshot -> Evolution Card -> Memory Ledger Entry -> Patch Proposal -> Human Approval -> Local Test -> Field Note -> Next-Run Bootstrap
 ```
 
 自动化边界：
 
-- 可以自动寻找证据、保存 run record、生成 evolution card、提出 minimal patch、写 field note。
+- 可以自动寻找证据、保存 run record、生成 evolution card、生成 memory ledger entry、提出 minimal patch、写 field note。
 - 只有人类批准后，才可以应用本地补丁、跑本地 dry-run、写 receipt。
 - 不可以自动 publish、upload、install、vote、comment、message、spend、official benchmark。
 - 外部动作只能输出 `human_approval_required`。
@@ -226,12 +248,13 @@ user_feedback
 
 ## 必须输出
 
-始终输出六段：
+始终输出七段：
 
 ```text
 Evidence Pack
 Snapshot
 Evolution Card
+Memory Ledger Entry
 Minimal Skill Patch Proposal
 Field Note
 Next-Run Bootstrap
@@ -258,6 +281,54 @@ files_or_context_checked:
 authority_order:
 privacy_notes:
 audit_confidence:
+```
+
+## Memory Ledger Entry
+
+每次审计后，只记录值得下一轮复用的内容。默认先输出候选条目，不自动落盘；只有在人类回复“保存”或“进化”并允许本地写入时，才把它写进现有 worklog、handoff、dashboard、Obsidian vault 或项目自己的记忆文件。
+
+```yaml
+memory_type: verified_fact | user_feedback | decision | skill_patch | retrieval_key | next_run_bootstrap
+source_evidence:
+confidence: high | medium | low
+expiry: never | date | condition
+retrieval_key:
+owner_or_role:
+write_target:
+content:
+```
+
+写入规则：
+
+- `verified_fact`: 必须有证据来源。
+- `user_feedback`: 标记为用户偏好或纠错，不当作客观事实。
+- `decision`: 记录人类批准、拒绝、暂停或授权边界。
+- `skill_patch`: 只记录已批准或候选补丁，不混淆状态。
+- `retrieval_key`: 用短键帮助下一轮优先找对文件或记录。
+- `next_run_bootstrap`: 下一轮启动时最短 3-5 条指令。
+- `write_target`: 如果不知道写到哪里，填 `proposed_only`，不要猜路径。
+
+不要记录：
+
+```text
+raw_secret
+private_customer_data
+unverified_guess
+dirty_log_without_summary
+entire_conversation_dump
+```
+
+推荐最小示例：
+
+```yaml
+memory_type: skill_patch
+source_evidence: "latest benchmark receipt + local dry-run receipt"
+confidence: medium
+expiry: "next benchmark or when contradicted"
+retrieval_key: "act_direct_execution"
+owner_or_role: "agent"
+write_target: "proposed_only"
+content: "Act 类任务优先输出：目标/边界 -> 最小工具链 -> action map -> idempotency -> evidence receipt -> stop condition。"
 ```
 
 ## Snapshot
@@ -380,10 +451,11 @@ Return:
 1. Evidence Pack
 2. Snapshot
 3. Evolution Card
-4. Minimal Skill Patch Proposal
-5. Field Note
-6. Next-Run Bootstrap
-7. Short Command Menu
+4. Memory Ledger Entry
+5. Minimal Skill Patch Proposal
+6. Field Note
+7. Next-Run Bootstrap
+8. Short Command Menu
 
 Rules:
 - 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。

@@ -17,11 +17,14 @@ Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。用户
 1. `Evidence Pack`: 找到了哪些证据、缺了哪些证据、可信度如何。
 2. `Snapshot`: 当前可信状态、未知状态、停止条件。
 3. `Evolution Card`: 本轮最该提升的能力维度和证据。
-4. `Minimal Skill Patch Proposal`: 一个最小可执行 skill 补丁提案。
-5. `Field Note`: 可发社区的测试记录。
-6. `Next-Run Bootstrap`: 下一轮启动时必须优先读取或执行的短指令。
+4. `Memory Ledger Entry`: 本轮值得沉淀的少量可检索记忆。
+5. `Minimal Skill Patch Proposal`: 一个最小可执行 skill 补丁提案。
+6. `Field Note`: 可发社区的测试记录。
+7. `Next-Run Bootstrap`: 下一轮启动时必须优先读取或执行的短指令。
 
 它不是只在 Agent 崩溃时救火，而是让 Agent 每一次完成任务后，都能沉淀一个可复用能力。
+
+它也不是普通的 memory skill。普通 memory 往往什么都记，最后变成新的噪音。Audit Evolution 只沉淀 `verified_fact / user_feedback / decision / skill_patch / retrieval_key / next_run_bootstrap`，并且每条都带证据、可信度、过期条件和下一轮检索 key。
 
 最后一步不是自动乱改系统，而是问人类：
 
@@ -89,7 +92,7 @@ Agent 可以自动保存 run record、生成 evolution card、提出 minimal pat
 理想输出不是一段泛泛总结，而是：
 
 ```text
-Evidence Pack -> Snapshot -> Evolution Card -> Minimal Skill Patch Proposal -> Field Note -> Next-Run Bootstrap -> 是否批准开始进化？
+Evidence Pack -> Snapshot -> Evolution Card -> Memory Ledger Entry -> Minimal Skill Patch Proposal -> Field Note -> Next-Run Bootstrap -> 是否批准开始进化？
 ```
 
 用户下一句不用写长 prompt，只要回：
