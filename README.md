@@ -30,6 +30,51 @@ Audit Evolution 是一个 Agent 自进化飞行记录仪。用户只要说一句
 说一句“开始调用 Audit Evolution”，让 Agent 自己找证据、审计自己、提出下一轮进化方案。
 ```
 
+## 一键安装
+
+把这个仓库下载到本地后，在仓库目录运行：
+
+Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-audit-evolution.ps1 -TargetWorkspace "D:\YourAgentWorkspace" -Agent codex -Force
+```
+
+macOS / Linux:
+
+```bash
+bash ./scripts/install-audit-evolution.sh --target "$HOME/your-agent-workspace" --agent openclaw --force
+```
+
+安装器会做四件事：
+
+1. 把 skill 复制到目标工作区的 `skills/audit-evolution/`。
+2. 写入或更新目标工作区的 `AGENTS.md`，让 Codex、OpenClaw 或其他 Agent 知道什么时候自动调用。
+3. 安装 `.audit-evolution/hooks/`，任务失败、跑分完成、上下文超过 60% 时可以生成 run record。
+4. 生成 `.audit-evolution/QUICKSTART_ZH.md`，用户可以直接复制给自己的 Agent。
+
+安装后，最短使用方式：
+
+```text
+开始调用 Audit Evolution。
+```
+
+或者在任务失败、跑分完成、上下文压力超过 60% 时触发 hook：
+
+Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\.audit-evolution\hooks\invoke-audit-evolution-hook.ps1 -EventType benchmark_completed -Summary "刚完成一次评测，需要审计并准备下一轮进化"
+```
+
+macOS / Linux:
+
+```bash
+bash ./.audit-evolution/hooks/invoke-audit-evolution-hook.sh --event benchmark_completed --summary "刚完成一次评测，需要审计并准备下一轮进化"
+```
+
+Codex 和 OpenClaw 是优先适配对象；其他 Agent 只要会读取 `AGENTS.md` 或 `skills/audit-evolution/SKILL.md`，也能按同一套协议使用。
+
 ## 为什么做这个
 
 很多 Agent 的问题不是模型不够聪明，而是运行状态不可见。

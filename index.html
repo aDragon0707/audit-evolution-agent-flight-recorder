@@ -723,6 +723,37 @@ promotion_gate:
 
   <section>
     <div class="topline">
+      <span class="mark">Install</span>
+      <span>下载后就能接入</span>
+    </div>
+    <h2>不是只给你一份文档，而是把触发入口也装进工作区</h2>
+    <div class="try-grid">
+      <div class="panel dark">
+        <div class="panel-label">Windows / Codex</div>
+<pre>powershell -ExecutionPolicy Bypass `
+  -File .\scripts\install-audit-evolution.ps1 `
+  -TargetWorkspace "D:\YourAgentWorkspace" `
+  -Agent codex `
+  -Force</pre>
+      </div>
+      <div class="panel clean">
+        <div class="panel-label">macOS / Linux / OpenClaw</div>
+<pre>bash ./scripts/install-audit-evolution.sh \
+  --target "$HOME/your-agent-workspace" \
+  --agent openclaw \
+  --force</pre>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="step-num">A</div><strong>复制 Skill</strong><span>安装到目标工作区的 skills/audit-evolution。</span></div>
+      <div class="flow-step"><div class="step-num">B</div><strong>写入路由</strong><span>更新 AGENTS.md，让 Agent 知道什么时候自动调用。</span></div>
+      <div class="flow-step"><div class="step-num">C</div><strong>生成 Hook</strong><span>任务失败、跑分完成、上下文超过 60% 时生成 run record。</span></div>
+      <div class="flow-step"><div class="step-num">D</div><strong>立刻使用</strong><span>用户只说“开始调用 Audit Evolution”或“进化”。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
       <span class="mark">For Audience</span>
       <span>现场 30 秒体验</span>
     </div>

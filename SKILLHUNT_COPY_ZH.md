@@ -101,6 +101,26 @@ Evidence Pack -> Snapshot -> Evolution Card -> Memory Ledger Entry -> Minimal Sk
 进化
 ```
 
+## 下载后怎么用
+
+这个 skill 支持三种使用方式：
+
+1. 直接让 Agent 读取 `SKILL.md`，然后说“开始调用 Audit Evolution”。
+2. 使用安装器写入 `AGENTS.md`，让 Codex / OpenClaw / 通用 Agent 自动识别触发条件。
+3. 使用 `.audit-evolution/hooks/` 在任务失败、跑分完成、上下文超过 60% 时生成 run record。
+
+Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-audit-evolution.ps1 -TargetWorkspace "D:\YourAgentWorkspace" -Agent codex -Force
+```
+
+macOS / Linux:
+
+```bash
+bash ./scripts/install-audit-evolution.sh --target "$HOME/your-agent-workspace" --agent openclaw --force
+```
+
 ## 现场 Demo
 
 我们用 Longju 和 Jobs 两只 Agent 做了测试：
