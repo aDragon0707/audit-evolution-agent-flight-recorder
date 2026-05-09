@@ -478,13 +478,14 @@
       <span>离线 Demo, 明天现场可直接打开</span>
     </div>
     <h1>让 Agent 每跑一轮，都变得更聪明</h1>
-    <p class="hero-subtitle">Audit Evolution 把跑分报告、任务记录、失败日志、普通输出，都转成下一轮可执行的进化卡片。</p>
+    <p class="hero-subtitle">用户只说一句“开始调用 Audit Evolution”，Agent 自己找证据、审计状态、提出下一轮进化方案。</p>
     <div class="proof-strip">
       <div class="proof">Longju: 93.0, S 级, 全球 #1</div>
       <div class="proof">Jobs: 88.8, A 级, 全球 #4</div>
       <div class="proof">DeepSeek-only 路线已验证</div>
-      <div class="proof">输入: 跑分报告 / worklog / 失败日志 / 普通输出</div>
-      <div class="proof">输出: Snapshot / Repair Plan / Field Note / Skill Patch</div>
+      <div class="proof">入口: 开始调用 Audit Evolution</div>
+      <div class="proof">自动找: 跑分 / worklog / 失败 / 反馈 / handoff</div>
+      <div class="proof">输出: Evidence Pack / Snapshot / Evolution Card / Patch Proposal</div>
     </div>
   </section>
 
@@ -542,7 +543,7 @@ Gear 修复可能已经完成，但我还需要再读几个文件确认一下。
       <span class="mark">After</span>
       <span>可恢复快照</span>
     </div>
-    <h2>Audit Evolution 把任何一次运行，压成下一轮进化输入</h2>
+    <h2>Audit Evolution 先找证据，再把运行压成下一轮进化输入</h2>
     <div class="split">
       <div class="panel dark">
         <div class="panel-label">YAML Frontmatter</div>
@@ -589,25 +590,30 @@ context 超过 70% 停止扩展。
       <span class="mark">Core Promise</span>
       <span>不是救火工具，是进化引擎</span>
     </div>
-    <h2>你的 Agent 没崩溃，也可以继续进化</h2>
+    <h2>你的 Agent 不需要崩溃，也不需要你搬运材料</h2>
     <div class="try-grid">
       <div class="panel clean">
-        <div class="panel-label">输入可以很普通</div>
-<pre>输入 A: 一次 BotLearn 跑分报告
-输入 B: 一段工作日志 worklog
-输入 C: 一次任务输出
-输入 D: 一段失败/超时/漂移日志
+        <div class="panel-label">用户入口只有一句</div>
+<pre>开始调用 Audit Evolution。
 
-不需要等它崩溃。
-只要有一次运行，就可以提炼下一轮进化。</pre>
+请先从当前上下文和允许访问的文件里自动寻找：
+- 最近任务输出
+- 用户反馈
+- 失败/超时/重试记录
+- benchmark 或评测结果
+- worklog / handoff / receipt
+- 最近修改过的 skill / config / gear
+
+先审计，不要直接修改。</pre>
       </div>
       <div class="output-stack">
+        <div class="mini-output"><strong>Evidence Pack</strong><span>先说明找到哪些证据、缺哪些证据、哪个文件更权威。</span></div>
         <div class="mini-output"><strong>Evolution Card</strong><span>识别本轮最该提升的能力维度：perceive / act / memory / guard / autonomy / reason。</span></div>
-        <div class="mini-output"><strong>Minimal Skill Patch</strong><span>只给一个最小补丁，例如补 webhook 骨架、memory ledger、source coverage。</span></div>
-        <div class="mini-output"><strong>Promotion Gate</strong><span>只有通过 dry-run、证据审计和 receipt，才把补丁晋升为长期 skill。</span></div>
+        <div class="mini-output"><strong>Patch Proposal</strong><span>只提出一个最小补丁，不直接改系统。</span></div>
+        <div class="mini-output"><strong>Human Approval</strong><span>最后问：是否批准开始进化？批准后才本地修改和测试。</span></div>
       </div>
     </div>
-    <p>它的招牌是：Agent 每做一次事，就多一个可复用的能力沉淀。</p>
+    <p>它的招牌是：Agent 每做一次事，就自己留下可审计证据，并把证据变成下一轮能力沉淀。</p>
   </section>
 
   <section>
@@ -690,15 +696,15 @@ promotion_gate:
   <section>
     <div class="topline">
       <span class="mark">How It Works</span>
-      <span>失败变成最小进化</span>
+      <span>一句话触发闭环</span>
     </div>
-    <h2>每一次失败，都留下下一轮可执行的修复路径</h2>
+    <h2>每一次任务结束，都可以留下下一轮可执行的修复路径</h2>
     <div class="flow">
-      <div class="flow-step"><div class="step-num">1</div><strong>记录</strong><span>保存目标、证据、分数、上下文压力。</span></div>
-      <div class="flow-step"><div class="step-num">2</div><strong>分层</strong><span>区分 trusted_state、uncertain_state、stale_claim。</span></div>
-      <div class="flow-step"><div class="step-num">3</div><strong>停止</strong><span>超过 70% 不扩展，读满 5 个文件仍不清楚就停。</span></div>
-      <div class="flow-step"><div class="step-num">4</div><strong>修复</strong><span>只生成一个最小 skill 补丁，不盲目重构。</span></div>
-      <div class="flow-step"><div class="step-num">5</div><strong>验证</strong><span>dry-run、payload audit、receipt，再决定是否晋升。</span></div>
+      <div class="flow-step"><div class="step-num">1</div><strong>触发</strong><span>用户说“开始调用”，或 benchmark / 失败 / 反馈自动触发。</span></div>
+      <div class="flow-step"><div class="step-num">2</div><strong>找证据</strong><span>最多读 5 个相关文件，先列 Evidence Pack。</span></div>
+      <div class="flow-step"><div class="step-num">3</div><strong>审计</strong><span>区分 verified_fact、stale_claim、unknown。</span></div>
+      <div class="flow-step"><div class="step-num">4</div><strong>提案</strong><span>只生成一个最小 patch proposal，不盲目重构。</span></div>
+      <div class="flow-step"><div class="step-num">5</div><strong>批准</strong><span>问人类是否开始进化，批准后才本地测试。</span></div>
     </div>
   </section>
 
@@ -707,28 +713,30 @@ promotion_gate:
       <span class="mark">For Audience</span>
       <span>现场 30 秒体验</span>
     </div>
-    <h2>给它任意一次 Agent 记录，它输出四件能直接用的东西</h2>
+    <h2>不用整理日志，只说一句话，它先自己找证据</h2>
     <div class="try-grid">
       <div class="panel dark">
-        <div class="panel-label">输入：任意 Agent 运行记录</div>
-<pre>我的 Agent 刚跑完一轮 benchmark。
-或者刚完成一个真实任务。
-或者只有一段普通 worklog。
+        <div class="panel-label">输入：一句话</div>
+<pre>开始调用 Audit Evolution。
 
-我想知道：
-- 它哪项能力最值得提升？
-- 哪些结论可信，哪些只是推断？
-- 下一步最小 skill 补丁是什么？
-- 怎么写成 field note 给别人看？</pre>
+目标：
+检查我的 Agent 最近一次任务后，
+是否应该继续自进化。
+
+边界：
+先审计和提出建议，
+不要直接修改系统。</pre>
       </div>
       <div class="output-stack">
-        <div class="mini-output"><strong>1. Snapshot</strong><span>提取当前状态、证据、未知点和停止条件。</span></div>
-        <div class="mini-output"><strong>2. Evolution Card</strong><span>告诉你这一轮应该提升哪个能力维度，以及为什么。</span></div>
-        <div class="mini-output"><strong>3. Skill Patch</strong><span>生成一个最小 skill 补丁或答题范式，不扩大系统复杂度。</span></div>
-        <div class="mini-output"><strong>4. Field Note</strong><span>自动生成可传播的测试记录：输入、变化、证据、下一步。</span></div>
+        <div class="mini-output"><strong>1. Evidence Pack</strong><span>它找到了哪些证据，哪些没找到，可信度如何。</span></div>
+        <div class="mini-output"><strong>2. Snapshot</strong><span>当前状态、未知点、停止条件。</span></div>
+        <div class="mini-output"><strong>3. Evolution Card</strong><span>这一轮应该提升哪个能力维度，以及为什么。</span></div>
+        <div class="mini-output"><strong>4. Patch Proposal</strong><span>一个最小 skill/config/gear 补丁提案，不直接应用。</span></div>
+        <div class="mini-output"><strong>5. Next-Run Bootstrap</strong><span>下一轮启动时优先读取和执行的短指令。</span></div>
+        <div class="mini-output"><strong>6. Approval Question</strong><span>是否批准开始进化？把控制权留给人类。</span></div>
       </div>
     </div>
-    <p>观众不需要先理解 SACP。只要给一段运行记录，就能看到自己的 Agent 如何从“完成一次任务”变成“沉淀一个能力”。</p>
+    <p>观众不需要先理解 SACP，也不需要手动整理材料。只要一句话，就能看到自己的 Agent 如何从“完成一次任务”变成“沉淀一个能力”。</p>
   </section>
 
   <section>
@@ -736,8 +744,8 @@ promotion_gate:
       <span class="mark">Closing</span>
       <span>一句话带走</span>
     </div>
-    <div class="closing">我们不是让 Agent 只完成一次任务。<br>我们让它每一次任务后，都变得更强。</div>
-    <p>Audit Evolution: 状态可恢复，过程可审计，经验可沉淀，Agent 可进化。</p>
+    <div class="closing">我们不是让 Agent 只完成一次任务。<br>我们让它学会审计自己，再请求进化。</div>
+    <p>Audit Evolution: 自动找证据，过程可审计，经验可沉淀，进化需批准。</p>
     <div class="note">备用文件: dirty_log.md / clean_snapshot.md</div>
   </section>
 </main>

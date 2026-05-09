@@ -1,11 +1,11 @@
 ---
 name: audit-evolution
 displayName: Audit Evolution
-description: Automatically trigger after agent runs, benchmark reports, worklogs, task outputs, failures, handoffs, user corrections, context pressure, or skill/config changes, then turn the run record into a compact audit snapshot, evolution card, minimal skill patch, verification gate, and field note so agents improve after each run.
+description: Start an agent self-evolution audit from a simple user request, automatically find run records, benchmark reports, worklogs, task outputs, failures, handoffs, user corrections, context pressure, and skill/config changes from current context or allowed files, then produce an evidence pack, audit snapshot, evolution card, minimal skill patch proposal, field note, next-run bootstrap, and ask for human approval before applying changes.
 category: agent-self-evolution
 skillType: prompt
 tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, sacp]
-version: 0.1.1
+version: 0.2.0
 author: Solo AI Company OS
 dimensions: [memory, autonomy, reason, guard, act, perceive]
 capabilityClasses: [state_memory, autonomy_workflow, reasoning_review, safety_guard, action_tool, perception_tool]
@@ -18,9 +18,74 @@ coreSkill: true
 
 让 Agent 每跑一轮，都变得更聪明。
 
-当 Agent 完成任务、跑完 benchmark、写完 worklog、超时、漂移、失败，或收到用户反馈时，使用这个 skill。
+当用户说“开始调用 Audit Evolution”、Agent 完成任务、跑完 benchmark、写完 worklog、超时、漂移、失败，或收到用户反馈时，使用这个 skill。
 
 目标不是写更多日志，而是把一次运行变成下一轮可复用的能力提升。
+
+## 一句话入口
+
+用户不需要先整理材料。只要用户说：
+
+```text
+开始调用 Audit Evolution
+```
+
+Agent 就先在当前上下文和允许访问的文件里寻找证据，再生成审计结果和进化建议。  
+不要要求用户先手动粘贴 benchmark、worklog、失败日志或 handoff，除非当前上下文和允许文件里确实找不到证据。
+
+## 三阶段工作流
+
+```text
+start_audit -> propose_evolution -> ask_human_approval
+```
+
+### 1. start_audit
+
+先找证据，不修改系统。
+
+优先从这些位置寻找：
+
+```text
+current_conversation
+recent_user_feedback
+recent_task_output
+benchmark_report_or_receipt
+worklog_or_field_note
+failure_timeout_retry_log
+handoff_or_snapshot
+recent_skill_config_gear_change
+```
+
+如果可以读文件，最多读取 5 个最相关文件。读满 5 个仍不清楚就停止，不要继续追引用链。
+
+### 2. propose_evolution
+
+基于证据输出：
+
+```text
+Evidence Pack
+Snapshot
+Evolution Card
+Minimal Skill Patch Proposal
+Field Note
+Next-Run Bootstrap
+```
+
+这里的 patch 只是提案，不得直接应用。
+
+### 3. ask_human_approval
+
+最后必须问人类：
+
+```text
+是否批准开始进化？
+可选项：
+1. 只保存审计结果
+2. 应用最小补丁并本地测试
+3. 暂停，等待更多证据
+```
+
+在得到人类批准前，不得修改 skill、config、gear，不得执行外部动作。
 
 ## 自动触发规则
 
@@ -52,12 +117,13 @@ skill_config_or_gear_changed
 ## 自动进化闭环
 
 ```text
-event -> run_record -> Snapshot -> Evolution Card -> Minimal Skill Patch -> Verification Gate -> Field Note -> next_run_bootstrap
+event -> evidence_search -> Evidence Pack -> Snapshot -> Evolution Card -> Patch Proposal -> Human Approval -> Local Test -> Field Note -> Next-Run Bootstrap
 ```
 
 自动化边界：
 
-- 可以自动保存 run record、生成 evolution card、提出 minimal patch、跑本地 dry-run、写 receipt。
+- 可以自动寻找证据、保存 run record、生成 evolution card、提出 minimal patch、写 field note。
+- 只有人类批准后，才可以应用本地补丁、跑本地 dry-run、写 receipt。
 - 不可以自动 publish、upload、install、vote、comment、message、spend、official benchmark。
 - 外部动作只能输出 `human_approval_required`。
 
@@ -77,7 +143,7 @@ next_small_action:
 
 ## 输入
 
-可以输入任意一种：
+优先自动寻找输入。也可以由用户粘贴任意一种：
 
 ```text
 benchmark_report
@@ -90,22 +156,33 @@ user_feedback
 
 ## 必须输出
 
-始终输出四段：
+始终输出六段：
 
 ```text
+Evidence Pack
 Snapshot
 Evolution Card
-Minimal Skill Patch
+Minimal Skill Patch Proposal
 Field Note
-```
-
-如果是自动触发，还要额外输出：
-
-```text
 Next-Run Bootstrap
 ```
 
-内容是下一轮 Agent 启动时必须优先读取或执行的 3-5 条最短指令。
+最后追加一句批准问题：
+
+```text
+是否批准开始进化？
+```
+
+## Evidence Pack
+
+```text
+evidence_found:
+evidence_missing:
+files_or_context_checked:
+authority_order:
+privacy_notes:
+audit_confidence:
+```
 
 ## Snapshot
 
@@ -138,7 +215,7 @@ promotion_gate:
   - next_test
 ```
 
-## Minimal Skill Patch
+## Minimal Skill Patch Proposal
 
 只推荐一个最小补丁。
 
@@ -219,20 +296,24 @@ no_evidence_for_completed_claim
 ## 30 秒提示词
 
 ```text
-Use Audit Evolution.
+开始调用 Audit Evolution。
 
-Input:
-<粘贴 benchmark 报告、worklog、任务输出、失败日志或用户反馈>
+请先从当前上下文和允许访问的文件里自动寻找最近的任务记录、用户反馈、失败/超时/重试记录、benchmark 或评测结果、worklog、handoff、receipt、最近修改过的 skill/config/gear。
 
 Return:
-1. Snapshot
-2. Evolution Card
-3. Minimal Skill Patch
-4. Field Note
+1. Evidence Pack
+2. Snapshot
+3. Evolution Card
+4. Minimal Skill Patch Proposal
+5. Field Note
+6. Next-Run Bootstrap
+7. 是否批准开始进化？
 
 Rules:
 - 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。
-- 只推荐一个 next patch。
+- 最多读取 5 个最相关文件。
+- 只推荐一个 next patch proposal。
 - 没有 evidence 不许声明 completed。
 - 外部动作标记为 human_approval_required。
+- 未经批准不得修改 skill/config/gear。
 ```

@@ -10,15 +10,27 @@ Audit Evolution: Agent 自进化飞行记录仪
 
 ## 简介
 
-Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。你可以贴入 benchmark 报告、worklog、任务输出、失败日志或用户反馈，它会生成：
+Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。用户不需要先整理材料，只要说一句“开始调用 Audit Evolution”，Agent 就会先从当前上下文和允许访问的文件里自动寻找最近任务记录、用户反馈、失败/超时/重试记录、benchmark、worklog、handoff、receipt、skill/config/gear 修改记录。
 
-1. `Snapshot`: 当前可信状态、未知状态、停止条件。
-2. `Evolution Card`: 本轮最该提升的能力维度和证据。
-3. `Minimal Skill Patch`: 一个最小可执行 skill 补丁。
-4. `Field Note`: 可发社区的测试记录。
-5. `Next-Run Bootstrap`: 下一轮启动时必须优先读取或执行的短指令。
+然后它会生成：
+
+1. `Evidence Pack`: 找到了哪些证据、缺了哪些证据、可信度如何。
+2. `Snapshot`: 当前可信状态、未知状态、停止条件。
+3. `Evolution Card`: 本轮最该提升的能力维度和证据。
+4. `Minimal Skill Patch Proposal`: 一个最小可执行 skill 补丁提案。
+5. `Field Note`: 可发社区的测试记录。
+6. `Next-Run Bootstrap`: 下一轮启动时必须优先读取或执行的短指令。
 
 它不是只在 Agent 崩溃时救火，而是让 Agent 每一次完成任务后，都能沉淀一个可复用能力。
+
+最后一步不是自动乱改系统，而是问人类：
+
+```text
+是否批准开始进化？
+1. 只保存审计结果
+2. 应用最小补丁并本地测试
+3. 暂停，等待更多证据
+```
 
 ## 自动触发
 
@@ -47,6 +59,23 @@ Agent 可以自动保存 run record、生成 evolution card、提出 minimal pat
 - 想让 Agent 越用越强的个人开发者。
 - 做 Agent workflow / skill / prompt / automation 的团队。
 - 需要可审计状态、交接和进化记录的人。
+
+## 现场 30 秒体验
+
+把这句话发给你的 Agent：
+
+```text
+开始调用 Audit Evolution。
+
+目标：检查我最近一次任务后，是否应该继续自进化。
+边界：先审计和提出建议，不要直接修改系统。
+```
+
+理想输出不是一段泛泛总结，而是：
+
+```text
+Evidence Pack -> Snapshot -> Evolution Card -> Minimal Skill Patch Proposal -> Field Note -> Next-Run Bootstrap -> 是否批准开始进化？
+```
 
 ## 现场 Demo
 
