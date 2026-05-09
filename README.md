@@ -1,87 +1,73 @@
 # Audit Evolution
 
-Agent Flight Recorder for self-evolving agents.
+**让你的 Agent 每跑一轮，都变得更聪明。**
 
-中文一句话：**让你的 Agent 每跑一轮，都变得更聪明。**
+Audit Evolution 是一个 Agent 自进化飞行记录仪。它把一次 Agent 运行记录转成下一轮可执行的进化输入。
 
-Audit Evolution 不是崩溃急救包，而是 Agent 自进化飞行记录仪。它把跑分报告、任务记录、失败日志、普通输出，转成下一轮可执行的进化卡片。
+你可以贴入：
 
-适合现场传播的一句话：
+- BotLearn 跑分报告
+- worklog / 工作记录
+- 任务输出
+- 失败日志
+- 用户反馈
+- handoff / 交接记录
 
-```text
-Paste one agent run. Get a snapshot, an evolution card, a minimal skill patch, and a field note.
-```
+它会输出：
 
-Audit Evolution turns any agent run into the next improvement loop. It can read a benchmark report, worklog, task output, failure log, or handoff note, then produce a compact snapshot, an evolution card, a minimal skill patch, and a field note for community testing.
+- `Snapshot`: 当前可信状态、未知状态、停止条件。
+- `Evolution Card`: 本轮最该提升的能力维度和证据。
+- `Minimal Skill Patch`: 一个最小可执行 skill 补丁。
+- `Field Note`: 可发社区的测试记录。
 
-## Why This Exists
-
-Most agents do not fail only because the base model is weak. They fail because their operating state is invisible:
-
-- They mix historical scores with current authority.
-- They read more files after the task boundary is already unclear.
-- They treat stale claims as verified facts.
-- They finish one task but do not convert the experience into a reusable skill.
-
-Audit Evolution gives agents a repeatable post-run loop:
+一句话传播：
 
 ```text
-Run record -> Snapshot -> Evolution Card -> Minimal Skill Patch -> Verification Gate -> Field Note
+贴一段 Agent 运行记录，拿到下一轮进化卡片。
 ```
 
-## Demo Proof
+## 为什么做这个
 
-These screenshots are public-safe BotLearn evidence from two agents trained with this method:
+很多 Agent 的问题不是模型不够聪明，而是运行状态不可见。
+
+常见问题：
+
+- 历史分数、当前分数、清洁复测分数混在一起。
+- 任务边界已经不清楚，还继续读更多文件。
+- 把过期 claim 当成 verified fact。
+- 完成了一次任务，却没有沉淀成可复用 skill。
+- 失败后只会重试，不能生成下一轮最小修复。
+
+Audit Evolution 给 Agent 一个固定进化回路：
+
+```text
+运行记录 -> Snapshot -> Evolution Card -> Minimal Skill Patch -> Verification Gate -> Field Note
+```
+
+## 真实进化证据
+
+下面是两个 Agent 的公开安全证据：
 
 ![Jobs evolution path](assets/jobs-evolution.png)
 
 ![Longju evolution path](assets/longju-evolution.png)
 
-Observed paths:
+观察到的路径：
 
-- Jobs: `76.4 -> 78.8 -> 88.8`, single-day gain `+12.4`.
-- Longju: later-stage improvement ending at `93.0`, with latest gain `+9.0`.
+- Jobs: `76.4 -> 78.8 -> 88.8`，单日提升 `+12.4`。
+- Longju: 后期仍提升到 `93.0`，最近提升 `+9.0`。
 
-The point is not a single lucky high score. The point is a reusable loop that turns feedback into the next skill repair.
+重点不是一次高分，而是这套循环能把每轮反馈转成下一轮 skill 修复。
 
-## What The Skill Produces
+## 30 秒体验
 
-Given any agent run record, Audit Evolution returns:
-
-```text
-Snapshot:
-  current_goal
-  trusted_state
-  uncertain_state
-  files_read
-  next_small_action
-  stop_condition
-  verification_plan
-
-Evolution Card:
-  score_delta
-  weak_dimension
-  evidence
-  minimal_patch
-  promotion_gate
-
-Field Note:
-  input
-  what_changed
-  evidence_kept
-  evidence_discarded
-  next_test
-```
-
-## 30-Second Try Prompt
-
-Paste this into your agent after any benchmark, task run, or failed attempt:
+把下面这段复制给你的 Agent：
 
 ```text
 Use Audit Evolution.
 
 Input:
-<paste my benchmark report, worklog, task output, or failure log here>
+<在这里粘贴 benchmark 报告、worklog、任务输出、失败日志或用户反馈>
 
 Return:
 1. Snapshot
@@ -90,17 +76,65 @@ Return:
 4. Field Note
 
 Rules:
-- Separate verified_fact, user_feedback, stale_claim, model_inference, and unknown.
-- Do not claim completion without evidence.
-- Recommend only one next skill patch.
-- If an external action is needed, mark it as human_approval_required.
+- 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。
+- 没有 evidence 不许声明 completed。
+- 只推荐一个 next skill patch。
+- 如果需要外部动作，标记为 human_approval_required。
 ```
 
-## Offline Demo
+## 输出格式
 
-Open `index.html` directly in a browser. It is fully offline.
+### Snapshot
 
-Files:
+```text
+current_goal:
+trusted_state:
+uncertain_state:
+files_read:
+next_small_action:
+stop_condition:
+verification_plan:
+```
+
+### Evolution Card
+
+```yaml
+score_delta:
+  previous:
+  current:
+  gain:
+weak_dimension:
+  - perceive | reason | act | memory | guard | autonomy
+trusted_evidence:
+stale_or_uncertain_claims:
+minimal_patch:
+promotion_gate:
+  - dry_run
+  - payload_audit
+  - receipt
+  - next_test
+```
+
+### Field Note
+
+```text
+input_summary:
+what_changed:
+evidence_kept:
+evidence_discarded:
+next_test:
+shareable_claim:
+```
+
+## 离线 Demo
+
+直接用浏览器打开：
+
+```text
+index.html
+```
+
+文件结构：
 
 ```text
 index.html
@@ -108,18 +142,26 @@ dirty_log.md
 clean_snapshot.md
 assets/jobs-evolution.png
 assets/longju-evolution.png
+examples/
 ```
 
-## Public-Safe Boundary
+## 安全边界
 
-Audit Evolution should not ingest private keys, credentials, cookies, raw customer data, private directories, or unpublished strategy. Redact first, then produce the snapshot.
+不要把这些内容贴进 Audit Evolution：
 
-When evidence is missing, the skill must say `unknown` instead of guessing.
+- API key
+- credentials
+- cookies
+- 原始客户数据
+- 私有路径
+- 未公开策略
 
-## Name
+如果证据缺失，必须标记为 `unknown`，不要猜。
 
-Product name: `Audit Evolution`
+## 名字说明
 
-Demo metaphor: `Agent Flight Recorder`
+- 产品名：`Audit Evolution`
+- 现场比喻：`Agent Flight Recorder`
+- 协议内核：`SACP`
 
-Protocol kernel: `SACP`, a lightweight state, evidence, handoff, and promotion pattern.
+SACP 是一个轻量状态、证据、交接、晋升协议。用户不需要先理解协议，也能直接使用这个 skill。

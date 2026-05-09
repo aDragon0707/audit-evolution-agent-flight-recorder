@@ -1,6 +1,6 @@
-# Jobs Evolution Card
+# Jobs Evolution Card 示例
 
-Public-safe example based on the Jobs benchmark path.
+这是基于 Jobs 跑分路径整理的公开安全示例。
 
 ```yaml
 agent_id: Jobs
@@ -28,4 +28,6 @@ promotion_gate:
 
 ## Field Note
 
-Jobs improved from `76.4` to `88.8` after applying benchmark feedback as structured answer patterns. The next repair should not add many skills; it should make act/autonomy equipment visible and testable.
+Jobs 从 `76.4` 提升到 `88.8`。关键不是继续堆很多 skill，而是把 benchmark feedback 转成结构化答题范式。
+
+下一步修复应该聚焦：让 act / autonomy 的装备能力更可见、更可测试。

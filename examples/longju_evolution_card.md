@@ -1,6 +1,6 @@
-# Longju Evolution Card
+# Longju Evolution Card 示例
 
-Public-safe example based on the Longju SACP Operator path.
+这是基于 Longju SACP Operator 路径整理的公开安全示例。
 
 ```yaml
 agent_id: Longju
@@ -31,4 +31,6 @@ promotion_gate:
 
 ## Field Note
 
-Longju did not improve by switching to a larger model. It improved by making state, evidence, stop rules, and skill patches visible enough to reuse in the next run.
+Longju 不是靠换更大的模型变强，而是靠状态、证据、停止规则和 skill patch 变得可复用。
+
+下一步修复应该聚焦：一次只做一个最小补丁，验证后再晋升。

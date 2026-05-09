@@ -1,7 +1,7 @@
 ---
 name: audit-evolution
 displayName: Audit Evolution
-description: Turn any agent run record, benchmark report, worklog, task output, failure log, or handoff note into a compact audit snapshot, evolution card, minimal skill patch, verification gate, and field note so agents improve after each run.
+description: Turn any agent run record, benchmark report, worklog, task output, failure log, handoff note, or user feedback into a compact audit snapshot, evolution card, minimal skill patch, verification gate, and field note so agents improve after each run.
 category: agent-self-evolution
 skillType: prompt
 tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, sacp]
@@ -16,13 +16,15 @@ coreSkill: true
 
 # Audit Evolution
 
-Use this skill after an agent completes a task, runs a benchmark, writes a worklog, times out, drifts, or receives user feedback.
+让 Agent 每跑一轮，都变得更聪明。
 
-The goal is not to write more logs. The goal is to turn one run into the next reusable improvement.
+当 Agent 完成任务、跑完 benchmark、写完 worklog、超时、漂移、失败，或收到用户反馈时，使用这个 skill。
 
-## Inputs
+目标不是写更多日志，而是把一次运行变成下一轮可复用的能力提升。
 
-Accept any one of these:
+## 输入
+
+可以输入任意一种：
 
 ```text
 benchmark_report
@@ -33,9 +35,9 @@ handoff_note
 user_feedback
 ```
 
-## Required Output
+## 必须输出
 
-Always return these four sections.
+始终输出四段：
 
 ```text
 Snapshot
@@ -44,7 +46,7 @@ Minimal Skill Patch
 Field Note
 ```
 
-### Snapshot
+## Snapshot
 
 ```text
 current_goal:
@@ -56,7 +58,7 @@ stop_condition:
 verification_plan:
 ```
 
-### Evolution Card
+## Evolution Card
 
 ```yaml
 score_delta:
@@ -75,11 +77,11 @@ promotion_gate:
   - next_test
 ```
 
-### Minimal Skill Patch
+## Minimal Skill Patch
 
-Recommend exactly one smallest useful patch.
+只推荐一个最小补丁。
 
-Good patch types:
+推荐补丁类型：
 
 ```text
 answer_pattern
@@ -91,7 +93,7 @@ context_stop_rule
 handoff_brief
 ```
 
-Avoid:
+避免：
 
 ```text
 install_many_skills
@@ -101,7 +103,7 @@ trust_stale_state
 claim_completed_without_evidence
 ```
 
-### Field Note
+## Field Note
 
 ```text
 input_summary:
@@ -114,19 +116,19 @@ shareable_claim:
 
 ## Trust Ledger
 
-Classify every important claim:
+每个重要 claim 都要分类：
 
 ```text
-verified_fact: checked now or backed by reproducible evidence
-user_feedback: user preference or correction
-stale_claim: old claim needing revalidation
-model_inference: reasoning, not evidence
-unknown: not known in this run
+verified_fact: 当前已验证，或有可复查证据支持
+user_feedback: 用户偏好、纠错或反馈
+stale_claim: 旧 claim，需要重新验证
+model_inference: 模型推断，不是证据
+unknown: 当前不知道
 ```
 
 ## Stop Rules
 
-Stop and write a snapshot when:
+遇到这些情况，停止扩展并写 snapshot：
 
 ```text
 more_than_5_files_needed
@@ -138,18 +140,18 @@ no_evidence_for_completed_claim
 
 ## Public-Safe Rules
 
-- Do not expose API keys, credentials, cookies, private paths, or raw customer data.
-- Redact sensitive evidence before writing field notes.
-- External actions such as publish, upload, install, vote, comment, message, spend, and official benchmark require explicit human approval.
-- If a claim cannot be verified, mark it `unknown` or `stale_claim`.
+- 不暴露 API keys、credentials、cookies、私有路径、原始客户数据。
+- 写 field note 前先脱敏。
+- publish、upload、install、vote、comment、message、spend、official benchmark 等外部动作，必须有人类明确批准。
+- 无法验证的 claim 必须标为 `unknown` 或 `stale_claim`。
 
-## 30-Second Prompt
+## 30 秒提示词
 
 ```text
 Use Audit Evolution.
 
 Input:
-<paste benchmark report, worklog, task output, failure log, or user feedback>
+<粘贴 benchmark 报告、worklog、任务输出、失败日志或用户反馈>
 
 Return:
 1. Snapshot
@@ -158,8 +160,8 @@ Return:
 4. Field Note
 
 Rules:
-- Separate verified_fact, user_feedback, stale_claim, model_inference, and unknown.
-- Recommend exactly one next patch.
-- Do not claim completion without evidence.
-- Mark external actions as human_approval_required.
+- 区分 verified_fact、user_feedback、stale_claim、model_inference、unknown。
+- 只推荐一个 next patch。
+- 没有 evidence 不许声明 completed。
+- 外部动作标记为 human_approval_required。
 ```
