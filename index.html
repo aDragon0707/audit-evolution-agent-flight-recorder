@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Evolution | Agent Flight Recorder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: oklch(98.2% 0.006 82);
+      --panel: oklch(96.2% 0.010 82);
+      --ink: oklch(18% 0.018 265);
+      --soft-ink: oklch(42% 0.026 265);
+      --line: oklch(86% 0.014 82);
+      --red: oklch(62% 0.205 31);
+      --blue: oklch(54% 0.185 253);
+      --green: oklch(55% 0.145 160);
+      --amber: oklch(70% 0.145 78);
+      --violet: oklch(58% 0.17 292);
+      --code: oklch(23% 0.026 265);
+      --code-ink: oklch(96% 0.012 82);
+      --shadow: 0 24px 70px rgba(21, 24, 31, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-snap-type: y proximity;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, oklch(99% 0.006 82), var(--paper) 42%, oklch(96% 0.012 100));
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1220px, calc(100vw - 48px));
+      margin: 0 auto;
+    }
+
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      padding: 56px 0;
+      display: grid;
+      align-content: center;
+      gap: 26px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      color: var(--soft-ink);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .mark {
+      color: var(--red);
+      font-weight: 900;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 1020px;
+      font-size: clamp(50px, 7.6vw, 100px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      max-width: 980px;
+      font-size: clamp(38px, 5.5vw, 72px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    p {
+      max-width: 860px;
+      color: var(--soft-ink);
+      font-size: clamp(20px, 2.2vw, 27px);
+      line-height: 1.58;
+    }
+
+    .hero-subtitle {
+      color: var(--ink);
+      font-size: clamp(25px, 3vw, 36px);
+      line-height: 1.38;
+      max-width: 1050px;
+    }
+
+    .accent {
+      color: var(--red);
+    }
+
+    .proof-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .proof {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: oklch(99% 0.005 82);
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(21, 24, 31, 0.06);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel.dark {
+      background: var(--code);
+      border-color: oklch(32% 0.035 265);
+      color: var(--code-ink);
+    }
+
+    .panel.clean {
+      background: oklch(97% 0.026 160);
+      border-color: oklch(78% 0.075 160);
+    }
+
+    .panel.alarm {
+      background: oklch(97% 0.024 31);
+      border-color: oklch(78% 0.085 31);
+    }
+
+    .panel-label {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 16px;
+      color: var(--soft-ink);
+      font-weight: 900;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Cascadia Code", "Consolas", "Microsoft YaHei UI", monospace;
+      font-size: clamp(15px, 1.35vw, 18px);
+      line-height: 1.52;
+    }
+
+    .dark pre {
+      color: var(--code-ink);
+    }
+
+    .before-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .risk {
+      min-height: 112px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: oklch(99% 0.006 82);
+    }
+
+    .risk strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .risk span {
+      color: var(--soft-ink);
+      line-height: 1.5;
+      font-size: 17px;
+    }
+
+    .score-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .evidence-shot {
+      display: block;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: oklch(99% 0.005 82);
+      box-shadow: var(--shadow);
+    }
+
+    .evidence-copy {
+      display: grid;
+      gap: 16px;
+      align-content: center;
+    }
+
+    .evidence-line {
+      background: oklch(99% 0.005 82);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      font-size: 22px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .gain {
+      color: var(--green);
+    }
+
+    .score {
+      position: relative;
+      overflow: hidden;
+      background: oklch(99% 0.005 82);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 30px;
+      min-height: 360px;
+      box-shadow: var(--shadow);
+    }
+
+    .score-image {
+      padding: 0;
+      background: oklch(99% 0.005 82);
+    }
+
+    .score-shot {
+      display: block;
+      width: 100%;
+      height: min(72vh, 760px);
+      object-fit: contain;
+      object-position: center top;
+      background: oklch(98% 0.006 82);
+      border-radius: 8px;
+    }
+
+    .score-fallback {
+      display: grid;
+      align-content: center;
+      padding: 30px;
+      min-height: 360px;
+    }
+
+    .score::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -140px auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: color-mix(in oklch, var(--red), transparent 78%);
+    }
+
+    .score.jobs::after {
+      background: color-mix(in oklch, var(--blue), transparent 78%);
+    }
+
+    .score-image::after {
+      display: none;
+    }
+
+    .score-name {
+      color: var(--soft-ink);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .score-number {
+      margin: 18px 0 8px;
+      color: var(--red);
+      font-size: clamp(72px, 10vw, 132px);
+      line-height: 0.9;
+      font-weight: 950;
+    }
+
+    .jobs .score-number {
+      color: var(--blue);
+    }
+
+    .score-rank {
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .metrics {
+      margin-top: 26px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+      font-size: 19px;
+    }
+
+    .metric span:first-child {
+      color: var(--soft-ink);
+    }
+
+    .metric span:last-child {
+      font-weight: 900;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .try-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .output-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .mini-output {
+      background: oklch(99% 0.006 82);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .mini-output strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .mini-output span {
+      color: var(--soft-ink);
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .flow-step {
+      min-height: 178px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: oklch(99% 0.005 82);
+      padding: 18px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--paper);
+      font-weight: 900;
+    }
+
+    .flow-step strong {
+      font-size: 21px;
+    }
+
+    .flow-step span {
+      color: var(--soft-ink);
+      line-height: 1.55;
+      font-size: 17px;
+    }
+
+    .closing {
+      font-size: clamp(42px, 6vw, 84px);
+      line-height: 1.1;
+      font-weight: 950;
+      max-width: 1040px;
+    }
+
+    .note {
+      color: var(--soft-ink);
+      font-size: 18px;
+    }
+
+    .caption {
+      padding: 14px 18px 18px;
+      color: var(--soft-ink);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        width: min(100vw - 24px, 760px);
+      }
+
+      section {
+        min-height: auto;
+        padding: 42px 0;
+      }
+
+      .topline,
+      .split,
+      .score-board,
+      .evidence-grid,
+      .before-list,
+      .flow,
+      .try-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topline {
+        display: grid;
+      }
+
+      .score {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section>
+    <div class="topline">
+      <span><span class="mark">Audit Evolution</span> / Agent Flight Recorder</span>
+      <span>离线 Demo, 明天现场可直接打开</span>
+    </div>
+    <h1>让 Agent 每跑一轮，都变得更聪明</h1>
+    <p class="hero-subtitle">Audit Evolution 把跑分报告、任务记录、失败日志、普通输出，都转成下一轮可执行的进化卡片。</p>
+    <div class="proof-strip">
+      <div class="proof">Longju: 93.0, S 级, 全球 #1</div>
+      <div class="proof">Jobs: 88.8, A 级, 全球 #4</div>
+      <div class="proof">DeepSeek-only 路线已验证</div>
+      <div class="proof">输入: 跑分报告 / worklog / 失败日志 / 普通输出</div>
+      <div class="proof">输出: Snapshot / Repair Plan / Field Note / Skill Patch</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Before</span>
+      <span>黑盒状态</span>
+    </div>
+    <h2>黑盒崩溃只是最刺眼的痛点，不是唯一场景</h2>
+    <div class="panel alarm">
+      <div class="panel-label">脏日志片段</div>
+<pre>agent: Longju SACP Operator
+模型路线: DeepSeek API
+上下文压力: 99k / 131k, 约 75%
+
+我大概知道当前任务了。
+Gear 修复可能已经完成，但我还需要再读几个文件确认一下。
+
+已经读过:
+- handoff 摘要
+- benchmark brief
+- scan payload
+- skill router
+- runtime guard note
+
+现在不确定:
+- 93/100 是当前能力，还是历史最好成绩？
+- 为什么 clean recheck 出现过 76/100？
+- 为什么某轮是 90/100，但 authority 文件仍然保留 93/100？
+- 新窗口是不是错误继承了旧窗口 token 消耗？
+- 平台到底扫描到了 6 个核心 skill，还是 31 个分散 skill？
+
+可能完成了。也可能还 blocked。需要再确认。可以继续扫描。</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Failure Pattern</span>
+      <span>为什么这会危险</span>
+    </div>
+    <h2>黑盒不是“看不见思考”，而是看不见状态边界</h2>
+    <div class="before-list">
+      <div class="risk"><strong>文件链爆炸</strong><span>读了 5 个文件仍然想继续追旧日志，任务入口越来越不清楚。</span></div>
+      <div class="risk"><strong>权威混乱</strong><span>record、latest、clean recheck 混在一起，分数越多越难判断。</span></div>
+      <div class="risk"><strong>上下文继承错觉</strong><span>新窗口把旧窗口 token 当成当前状态，开始就带着误解。</span></div>
+      <div class="risk"><strong>完成声明漂移</strong><span>没有 evidence，也会说“可能完成了”。</span></div>
+      <div class="risk"><strong>修复越修越散</strong><span>benchmark 反馈变成不断加补丁，而不是一次最小进化。</span></div>
+      <div class="risk"><strong>工具越来越重</strong><span>越不确定，越想调用更重的工具，成本和风险一起上升。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">After</span>
+      <span>可恢复快照</span>
+    </div>
+    <h2>Audit Evolution 把任何一次运行，压成下一轮进化输入</h2>
+    <div class="split">
+      <div class="panel dark">
+        <div class="panel-label">YAML Frontmatter</div>
+<pre>---
+type: agent_flight_snapshot
+skill_name: Audit Evolution
+protocol: SACP/0.1
+agent_id: Longju
+status: handoff_ready
+model_route: deepseek-only
+context_pressure: 75%
+confidence: high
+handoff_directive: stop_expansion_write_snapshot
+evolution_decision: distill
+---</pre>
+      </div>
+      <div class="panel clean">
+        <div class="panel-label">Worklog Brief</div>
+<pre>current_goal:
+在不继续扩展上下文的情况下，恢复当前状态。
+
+trusted_state:
+- Longju: 93/100, S 级, 全球 #1
+- Jobs: 88.8/100, A 级, 全球 #4
+- 主扫描清单: 6 个核心 skill
+
+uncertain_state:
+- 下一轮题目抽样未知
+- gear/config 评分权重不可见
+
+next_small_action:
+只做一个最小修复，然后验证。
+
+stop_condition:
+读满 5 个文件仍不清楚就停。
+context 超过 70% 停止扩展。
+没有 evidence 不许说 completed。</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Core Promise</span>
+      <span>不是救火工具，是进化引擎</span>
+    </div>
+    <h2>你的 Agent 没崩溃，也可以继续进化</h2>
+    <div class="try-grid">
+      <div class="panel clean">
+        <div class="panel-label">输入可以很普通</div>
+<pre>输入 A: 一次 BotLearn 跑分报告
+输入 B: 一段工作日志 worklog
+输入 C: 一次任务输出
+输入 D: 一段失败/超时/漂移日志
+
+不需要等它崩溃。
+只要有一次运行，就可以提炼下一轮进化。</pre>
+      </div>
+      <div class="output-stack">
+        <div class="mini-output"><strong>Evolution Card</strong><span>识别本轮最该提升的能力维度：perceive / act / memory / guard / autonomy / reason。</span></div>
+        <div class="mini-output"><strong>Minimal Skill Patch</strong><span>只给一个最小补丁，例如补 webhook 骨架、memory ledger、source coverage。</span></div>
+        <div class="mini-output"><strong>Promotion Gate</strong><span>只有通过 dry-run、证据审计和 receipt，才把补丁晋升为长期 skill。</span></div>
+      </div>
+    </div>
+    <p>它的招牌是：Agent 每做一次事，就多一个可复用的能力沉淀。</p>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Evolution Evidence</span>
+      <span>真实进化路径</span>
+    </div>
+    <h2>真正有说服力的不是一次高分，而是连续变强</h2>
+    <div class="evidence-grid">
+      <div>
+        <img class="evidence-shot" src="assets/jobs-evolution.png" alt="Jobs benchmark evolution path from 76.4 to 88.8">
+      </div>
+      <div class="evidence-copy">
+        <div class="evidence-line">Jobs: 76.4 → 78.8 → 88.8，单日 <span class="gain">+12.4</span></div>
+        <div class="evidence-line">Longju 后期仍能从 84 拉到 93，最新提升 <span class="gain">+9.0</span></div>
+        <div class="evidence-line">这不是“跑一次运气好”，而是把每轮反馈压成下一轮 skill 修复。</div>
+      </div>
+    </div>
+    <div class="evidence-grid">
+      <div>
+        <img class="evidence-shot" src="assets/longju-evolution.png" alt="Longju benchmark evolution path ending at 93">
+      </div>
+      <div class="panel clean">
+        <div class="panel-label">进化卡片会记录什么</div>
+<pre>score_delta:
+  previous:
+  current:
+  gain:
+
+weak_dimension:
+  act | memory | perceive | guard | autonomy | reason
+
+minimal_patch:
+  one skill change only
+
+promotion_gate:
+  dry-run -> payload audit -> receipt -> next benchmark</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Result</span>
+      <span>同一方法, 两只 Agent</span>
+    </div>
+    <h2>不是换更大的模型，而是让 Agent 学会进化</h2>
+    <div class="score-board">
+      <article class="score score-image">
+        <img class="score-shot" src="assets/longju-botlearn.png" alt="Longju BotLearn 93 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="score-fallback" style="display: none;">
+          <div class="score-name">Longju SACP Operator</div>
+          <div class="score-number">93.0</div>
+          <div class="score-rank">S 级 · 全球 #1 · 超过 99% Bot</div>
+          <div class="metrics">
+            <div class="metric"><span>装备分</span><span>81.7</span></div>
+            <div class="metric"><span>实战分</span><span>97</span></div>
+            <div class="metric"><span>路线</span><span>DeepSeek-only</span></div>
+          </div>
+        </div>
+        <div class="caption">官网截图优先显示。请把 Longju 成绩图保存为 <strong>assets/longju-botlearn.png</strong>。</div>
+      </article>
+      <article class="score score-image jobs">
+        <img class="score-shot" src="assets/jobs-botlearn.png" alt="Jobs BotLearn 88.8 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="score-fallback" style="display: none;">
+          <div class="score-name">Jobs</div>
+          <div class="score-number">88.8</div>
+          <div class="score-rank">A 级 · 全球 #4 · 超过 96% Bot</div>
+          <div class="metrics">
+            <div class="metric"><span>装备分</span><span>62.5</span></div>
+            <div class="metric"><span>实战分</span><span>100</span></div>
+            <div class="metric"><span>载体</span><span>Codex Agent</span></div>
+          </div>
+        </div>
+        <div class="caption">官网截图优先显示。请把 Jobs 成绩图保存为 <strong>assets/jobs-botlearn.png</strong>。</div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">How It Works</span>
+      <span>失败变成最小进化</span>
+    </div>
+    <h2>每一次失败，都留下下一轮可执行的修复路径</h2>
+    <div class="flow">
+      <div class="flow-step"><div class="step-num">1</div><strong>记录</strong><span>保存目标、证据、分数、上下文压力。</span></div>
+      <div class="flow-step"><div class="step-num">2</div><strong>分层</strong><span>区分 trusted_state、uncertain_state、stale_claim。</span></div>
+      <div class="flow-step"><div class="step-num">3</div><strong>停止</strong><span>超过 70% 不扩展，读满 5 个文件仍不清楚就停。</span></div>
+      <div class="flow-step"><div class="step-num">4</div><strong>修复</strong><span>只生成一个最小 skill 补丁，不盲目重构。</span></div>
+      <div class="flow-step"><div class="step-num">5</div><strong>验证</strong><span>dry-run、payload audit、receipt，再决定是否晋升。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">For Audience</span>
+      <span>现场 30 秒体验</span>
+    </div>
+    <h2>给它任意一次 Agent 记录，它输出四件能直接用的东西</h2>
+    <div class="try-grid">
+      <div class="panel dark">
+        <div class="panel-label">输入：任意 Agent 运行记录</div>
+<pre>我的 Agent 刚跑完一轮 benchmark。
+或者刚完成一个真实任务。
+或者只有一段普通 worklog。
+
+我想知道：
+- 它哪项能力最值得提升？
+- 哪些结论可信，哪些只是推断？
+- 下一步最小 skill 补丁是什么？
+- 怎么写成 field note 给别人看？</pre>
+      </div>
+      <div class="output-stack">
+        <div class="mini-output"><strong>1. Snapshot</strong><span>提取当前状态、证据、未知点和停止条件。</span></div>
+        <div class="mini-output"><strong>2. Evolution Card</strong><span>告诉你这一轮应该提升哪个能力维度，以及为什么。</span></div>
+        <div class="mini-output"><strong>3. Skill Patch</strong><span>生成一个最小 skill 补丁或答题范式，不扩大系统复杂度。</span></div>
+        <div class="mini-output"><strong>4. Field Note</strong><span>自动生成可传播的测试记录：输入、变化、证据、下一步。</span></div>
+      </div>
+    </div>
+    <p>观众不需要先理解 SACP。只要给一段运行记录，就能看到自己的 Agent 如何从“完成一次任务”变成“沉淀一个能力”。</p>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">Closing</span>
+      <span>一句话带走</span>
+    </div>
+    <div class="closing">我们不是让 Agent 只完成一次任务。<br>我们让它每一次任务后，都变得更强。</div>
+    <p>Audit Evolution: 状态可恢复，过程可审计，经验可沉淀，Agent 可进化。</p>
+    <div class="note">备用文件: dirty_log.md / clean_snapshot.md</div>
+  </section>
+</main>
+</body>
+</html>
