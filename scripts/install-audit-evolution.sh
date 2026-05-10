@@ -45,7 +45,7 @@ fi
 
 mkdir -p "$SKILL_DIR"
 
-for name in SKILL.md README.md SKILLHUNT_COPY_ZH.md FIELD_NOTE_TEMPLATE.md dirty_log.md clean_snapshot.md DESIGN_REVIEW_ZH.md index.html agents assets examples scripts; do
+for name in SKILL.md README.md ADAPTERS_ZH.md QUICKSTART_60S_ZH.md DEMO_PLAYBOOK_ZH.md INSTALL_TEST_ZH.md SKILLHUNT_COPY_ZH.md FIELD_NOTE_TEMPLATE.md dirty_log.md clean_snapshot.md DESIGN_REVIEW_ZH.md index.html agents assets examples scripts; do
   if [[ -e "$REPO_ROOT/$name" ]]; then
     rm -rf "$SKILL_DIR/$name"
     cp -R "$REPO_ROOT/$name" "$SKILL_DIR/$name"

@@ -5,11 +5,11 @@ description: Turn an agent's last run into a self-evolution loop: find evidence,
 category: ai-agents
 skillType: prompt
 tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, memory-ledger, sacp]
-version: 0.3.1
+version: 0.3.2
 author: Solo AI Company OS
 dimensions: [memory, autonomy, reason, guard, act, perceive]
 capabilityClasses: [state_memory, autonomy_workflow, reasoning_review, safety_guard, action_tool, perception_tool]
-evidenceFiles: [README.md, ADAPTERS_ZH.md, dirty_log.md, clean_snapshot.md, examples/closed_loop_case_zh.md, examples/memory_ledger_entry_zh.md, DESIGN_REVIEW_ZH.md, index.html]
+evidenceFiles: [README.md, ADAPTERS_ZH.md, QUICKSTART_60S_ZH.md, DEMO_PLAYBOOK_ZH.md, INSTALL_TEST_ZH.md, dirty_log.md, clean_snapshot.md, examples/closed_loop_case_zh.md, examples/memory_ledger_entry_zh.md, DESIGN_REVIEW_ZH.md, index.html]
 smokeTests: [evidence_pack_from_context, snapshot_from_run_record, evolution_card_from_benchmark, memory_ledger_entry, minimal_skill_patch_gate, short_command_routing]
 coreSkill: true
 ---

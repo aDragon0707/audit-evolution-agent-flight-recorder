@@ -1,8 +1,20 @@
 # Audit Evolution
 
-**让你的 Agent 每跑一轮，都变得更聪明。**
+**让你的 Agent 从每次失败、反馈和跑分里自动进化。**
 
 Audit Evolution 是一个 Agent 自进化飞行记录仪。用户只要说一句“开始调用 Audit Evolution”，Agent 就会先从当前上下文和允许访问的文件里自动寻找运行记录、反馈和失败证据，再把它们转成下一轮可执行的进化输入。
+
+最短入口：
+
+```text
+进化
+```
+
+它不是让 Agent 多写一段总结，而是把一次运行变成一个闭环：
+
+```text
+证据 -> 快照 -> 进化卡片 -> 记忆账本 -> 最小补丁 -> 下一轮启动指令
+```
 
 它会主动寻找：
 
@@ -29,6 +41,20 @@ Audit Evolution 是一个 Agent 自进化飞行记录仪。用户只要说一句
 ```text
 说一句“开始调用 Audit Evolution”，让 Agent 自己找证据、审计自己、提出下一轮进化方案。
 ```
+
+## 先看结果
+
+这套方法先在两个 Agent 上做了 public-safe 测试：
+
+![Longju BotLearn 93 分官网成绩截图](assets/longju-botlearn.png)
+
+![Jobs BotLearn 88.8 分官网成绩截图](assets/jobs-botlearn.png)
+
+观察到的进化路径：
+
+- Longju: `93.0/100`，S 级，全球 #1，超过 99% Bot。
+- Jobs: `76.4 -> 78.8 -> 88.8`，进入全球 #4。
+- 关键不是一次高分，而是每次失败后都能生成下一轮最小修复。
 
 ## 一键安装
 
@@ -327,7 +353,7 @@ stop_if:
 - 详情:
 ```
 
-## 离线 Demo
+## 90 秒现场 Demo
 
 直接用浏览器打开：
 
@@ -335,16 +361,18 @@ stop_if:
 index.html
 ```
 
-文件结构：
+配套文件：
 
-```text
-index.html
-dirty_log.md
-clean_snapshot.md
-assets/jobs-evolution.png
-assets/longju-evolution.png
-examples/
-```
+- [60 秒上手](QUICKSTART_60S_ZH.md)
+- [现场 Demo 脚本](DEMO_PLAYBOOK_ZH.md)
+
+现场讲法：
+
+1. 先亮结果：Longju 93.0 全球 #1，Jobs 88.8 全球 #4。
+2. 展示痛点：普通 Agent 长任务后会混淆权威文件、上下文、分数和完成状态。
+3. 展示介入：Audit Evolution 把脏运行压成 Evidence Pack、Snapshot、Evolution Card、Memory Ledger。
+4. 展示闭环：最后不直接乱改，而是问人类“进化 / 保存 / 暂停 / 跑分 / 详情”。
+5. 结尾一句：它不是替 Agent 做题，它让 Agent 从每次运行中变强。
 
 推荐先看：
 

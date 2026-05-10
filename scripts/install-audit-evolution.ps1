@@ -46,6 +46,10 @@ New-Item -ItemType Directory -Force -Path $skillDir | Out-Null
 $include = @(
   "SKILL.md",
   "README.md",
+  "ADAPTERS_ZH.md",
+  "QUICKSTART_60S_ZH.md",
+  "DEMO_PLAYBOOK_ZH.md",
+  "INSTALL_TEST_ZH.md",
   "SKILLHUNT_COPY_ZH.md",
   "FIELD_NOTE_TEMPLATE.md",
   "dirty_log.md",

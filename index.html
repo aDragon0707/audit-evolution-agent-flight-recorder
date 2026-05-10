@@ -475,7 +475,6 @@
   <section>
     <div class="topline">
       <span><span class="mark">Audit Evolution</span> / Agent Flight Recorder</span>
-      <span>离线 Demo, 明天现场可直接打开</span>
     </div>
     <h1>让 Agent 每跑一轮，都变得更聪明</h1>
     <p class="hero-subtitle">用户只说一句“开始调用 Audit Evolution”，Agent 自己找证据、审计状态、提出下一轮进化方案。</p>
@@ -487,6 +486,43 @@
       <div class="proof">自动找: 跑分 / worklog / 失败 / 反馈 / handoff</div>
       <div class="proof">输出: Evidence Pack / Snapshot / Evolution Card / Memory Ledger / Patch Proposal</div>
       <div class="proof">人类只回: 进化 / 保存 / 暂停 / 跑分</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="topline">
+      <span class="mark">公开成绩</span>
+      <span>先看结果，再讲机制</span>
+    </div>
+    <h2>不是换更大的模型，而是让 Agent 学会进化</h2>
+    <p>同一套 Audit Evolution 思路，先在 Longju 和 Jobs 上跑出可见结果：一个冲到全球 #1，一个从普通分段冲进全球 #4。</p>
+    <div class="score-board">
+      <article class="score score-image">
+        <img class="score-shot" src="assets/longju-botlearn.png" alt="Longju BotLearn 93 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="score-fallback" style="display: none;">
+          <div class="score-name">Longju SACP Operator</div>
+          <div class="score-number">93.0</div>
+          <div class="score-rank">S 级 · 全球 #1 · 超过 99% Bot</div>
+          <div class="metrics">
+            <div class="metric"><span>装备分</span><span>81.7</span></div>
+            <div class="metric"><span>实战分</span><span>97</span></div>
+            <div class="metric"><span>路线</span><span>DeepSeek-only</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="score score-image jobs">
+        <img class="score-shot" src="assets/jobs-botlearn.png" alt="Jobs BotLearn 88.8 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="score-fallback" style="display: none;">
+          <div class="score-name">Jobs</div>
+          <div class="score-number">88.8</div>
+          <div class="score-rank">A 级 · 全球 #4 · 超过 96% Bot</div>
+          <div class="metrics">
+            <div class="metric"><span>装备分</span><span>62.5</span></div>
+            <div class="metric"><span>实战分</span><span>100</span></div>
+            <div class="metric"><span>载体</span><span>Codex Agent</span></div>
+          </div>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -669,44 +705,6 @@ promotion_gate:
 
   <section>
     <div class="topline">
-      <span class="mark">Result</span>
-      <span>同一方法, 两只 Agent</span>
-    </div>
-    <h2>不是换更大的模型，而是让 Agent 学会进化</h2>
-    <div class="score-board">
-      <article class="score score-image">
-        <img class="score-shot" src="assets/longju-botlearn.png" alt="Longju BotLearn 93 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-        <div class="score-fallback" style="display: none;">
-          <div class="score-name">Longju SACP Operator</div>
-          <div class="score-number">93.0</div>
-          <div class="score-rank">S 级 · 全球 #1 · 超过 99% Bot</div>
-          <div class="metrics">
-            <div class="metric"><span>装备分</span><span>81.7</span></div>
-            <div class="metric"><span>实战分</span><span>97</span></div>
-            <div class="metric"><span>路线</span><span>DeepSeek-only</span></div>
-          </div>
-        </div>
-        <div class="caption">官网截图优先显示。请把 Longju 成绩图保存为 <strong>assets/longju-botlearn.png</strong>。</div>
-      </article>
-      <article class="score score-image jobs">
-        <img class="score-shot" src="assets/jobs-botlearn.png" alt="Jobs BotLearn 88.8 分官网成绩截图" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-        <div class="score-fallback" style="display: none;">
-          <div class="score-name">Jobs</div>
-          <div class="score-number">88.8</div>
-          <div class="score-rank">A 级 · 全球 #4 · 超过 96% Bot</div>
-          <div class="metrics">
-            <div class="metric"><span>装备分</span><span>62.5</span></div>
-            <div class="metric"><span>实战分</span><span>100</span></div>
-            <div class="metric"><span>载体</span><span>Codex Agent</span></div>
-          </div>
-        </div>
-        <div class="caption">官网截图优先显示。请把 Jobs 成绩图保存为 <strong>assets/jobs-botlearn.png</strong>。</div>
-      </article>
-    </div>
-  </section>
-
-  <section>
-    <div class="topline">
       <span class="mark">How It Works</span>
       <span>一句话触发闭环</span>
     </div>
@@ -791,7 +789,6 @@ promotion_gate:
     </div>
     <div class="closing">我们不是让 Agent 只完成一次任务。<br>我们让它审计自己，并听懂人类一句“进化”。</div>
     <p>Audit Evolution: 自动找证据，过程可审计，记忆可检索，经验可沉淀，短指令可路由。</p>
-    <div class="note">备用文件: dirty_log.md / clean_snapshot.md</div>
   </section>
 </main>
 </body>
