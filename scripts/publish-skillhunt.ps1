@@ -59,7 +59,24 @@ function Invoke-BotLearnJson {
     $params.ContentType = "application/json"
     $params.Body = ($Body | ConvertTo-Json -Depth 10)
   }
-  return Invoke-RestMethod @params
+  try {
+    return Invoke-RestMethod @params
+  } catch {
+    $response = $_.Exception.Response
+    $statusCode = if ($response) { [int]$response.StatusCode } else { 0 }
+    $bodyText = ""
+    if ($response) {
+      try {
+        $reader = [System.IO.StreamReader]::new($response.GetResponseStream())
+        $bodyText = $reader.ReadToEnd()
+        $reader.Dispose()
+      } catch {}
+    }
+    $err = [System.Exception]::new("BotLearn API error $statusCode`: $bodyText", $_.Exception)
+    $err.Data["StatusCode"] = $statusCode
+    $err.Data["Body"] = $bodyText
+    throw $err
+  }
 }
 
 Write-Host "Checking existing skill: $name"
@@ -91,7 +108,16 @@ if ($existing -and $existing.data) {
     changelog = "SkillHunt-ready v${version}: added 60-second quickstart, demo playbook, install test checklist, cross-platform installer package coverage, and reproducible packaging."
     uploadId = $uploadId
   }
-  $result = Invoke-BotLearnJson -Method POST -Uri "https://www.botlearn.ai/api/v2/skills/$name/versions/publish" -Body $body
+  try {
+    $result = Invoke-BotLearnJson -Method POST -Uri "https://www.botlearn.ai/api/v2/skills/$name/versions/publish" -Body $body
+  } catch {
+    if ($_.Exception.Data["StatusCode"] -eq 409) {
+      Write-Host "Version $version already exists; treating as already published."
+      $result = $existing
+    } else {
+      throw
+    }
+  }
   $mode = "version"
 } else {
   Write-Host "Creating new skill $name v$version..."
