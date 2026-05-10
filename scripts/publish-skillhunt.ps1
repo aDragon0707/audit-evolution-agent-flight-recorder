@@ -86,7 +86,7 @@ if ($existing -and $existing.data) {
   Write-Host "Publishing new version $version..."
   $body = @{
     version = $version
-    changelog = "SkillHunt-ready v$version: added 60-second quickstart, demo playbook, install test checklist, cross-platform installer package coverage, and reproducible packaging."
+    changelog = "SkillHunt-ready v${version}: added 60-second quickstart, demo playbook, install test checklist, cross-platform installer package coverage, and reproducible packaging."
     uploadId = $uploadId
   }
   $result = Invoke-BotLearnJson -Method POST -Uri "https://www.botlearn.ai/api/v2/skills/$name/versions/publish" -Body $body
