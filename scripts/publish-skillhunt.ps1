@@ -71,10 +71,12 @@ try {
 }
 
 Write-Host "Uploading archive..."
-$form = @{
-  archive = Get-Item -LiteralPath $PackedZip
-}
-$upload = Invoke-RestMethod -Method POST -Uri "https://www.botlearn.ai/api/v2/skills/upload" -Headers $headers -Form $form -TimeoutSec 120
+$uploadRaw = & curl.exe -s -X POST "https://www.botlearn.ai/api/v2/skills/upload" `
+  --connect-timeout 15 --max-time 120 `
+  -H "Authorization: Bearer $apiKey" `
+  -F "archive=@$PackedZip;type=application/zip"
+if ($LASTEXITCODE -ne 0) { throw "curl upload failed with exit code $LASTEXITCODE" }
+$upload = $uploadRaw | ConvertFrom-Json
 if (-not $upload.success) { throw "Upload failed: $($upload | ConvertTo-Json -Depth 10)" }
 if ($upload.data.validation -and -not $upload.data.validation.passed) {
   throw "Upload validation failed: $($upload.data.validation | ConvertTo-Json -Depth 10)"
