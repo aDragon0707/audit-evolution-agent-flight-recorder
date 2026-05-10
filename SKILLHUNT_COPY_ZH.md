@@ -2,15 +2,17 @@
 
 ## 标题
 
-Audit Evolution: Agent 自进化飞行记录仪
+Audit Evolution: 我们用它把 Longju 跑到 93.0、Jobs 跑到 88.8
 
 ## 一句话
 
-让你的 Agent 每跑一轮，都变得更聪明。
+一套可复现的 Agent 自进化飞行记录仪：每次运行后自动找证据、审计状态、沉淀记忆、提出最小补丁，让 Agent 越跑越强。
 
 ## 简介
 
-Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。用户不需要先整理材料，只要说一句“开始调用 Audit Evolution”，Agent 就会先从当前上下文和允许访问的文件里自动寻找最近任务记录、用户反馈、失败/超时/重试记录、benchmark、worklog、handoff、receipt、skill/config/gear 修改记录。
+Audit Evolution 把一次 Agent 运行记录转成下一轮进化输入。我们用这套闭环把 Longju 推到 `93.0/100`，把 Jobs 从 `76.4 -> 78.8 -> 88.8`，证明它不是概念 demo，而是一套可以复现的 Agent 自进化工作流。
+
+用户不需要先整理材料，只要说一句“开始调用 Audit Evolution”，Agent 就会先从当前上下文和允许访问的文件里自动寻找最近任务记录、用户反馈、失败/超时/重试记录、benchmark、worklog、handoff、receipt、skill/config/gear 修改记录。
 
 然后它会生成：
 

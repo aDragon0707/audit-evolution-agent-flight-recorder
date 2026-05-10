@@ -1,11 +1,11 @@
 ---
 name: audit-evolution
 displayName: Audit Evolution
-description: Turn an agent's last run into a self-evolution loop: find evidence, separate facts from stale claims, produce a snapshot, evolution card, memory ledger entry, patch proposal, field note, next-run bootstrap, and route one-word human commands like "进化" without applying changes before approval.
+description: We used this reproducible Agent self-evolution loop to push Longju to 93.0 and Jobs to 88.8: every run becomes evidence, a snapshot, an evolution card, a memory ledger, a minimal patch proposal, and a next-run bootstrap before any human-approved change.
 category: ai-agents
 skillType: prompt
 tags: [agent, self-evolution, audit, benchmark, worklog, handoff, skill, field-note, memory-ledger, sacp]
-version: 0.3.2
+version: 0.3.3
 author: Solo AI Company OS
 dimensions: [memory, autonomy, reason, guard, act, perceive]
 capabilityClasses: [state_memory, autonomy_workflow, reasoning_review, safety_guard, action_tool, perception_tool]

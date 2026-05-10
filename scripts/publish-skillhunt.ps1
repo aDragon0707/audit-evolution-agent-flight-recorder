@@ -105,7 +105,7 @@ if ($existing -and $existing.data) {
   Write-Host "Publishing new version $version..."
   $body = @{
     version = $version
-    changelog = "SkillHunt-ready v${version}: added 60-second quickstart, demo playbook, install test checklist, cross-platform installer package coverage, and reproducible packaging."
+    changelog = "SkillHunt copy v${version}: sharper public positioning around the reproducible Longju 93.0 and Jobs 88.8 self-evolution results, while keeping the approval-gated safety boundary."
     uploadId = $uploadId
   }
   try {
